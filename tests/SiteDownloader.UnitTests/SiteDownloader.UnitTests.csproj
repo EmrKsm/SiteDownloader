@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\SiteDownloader.Core\SiteDownloader.Core.csproj" />
+    <ProjectReference Include="..\..\src\SiteDownloader.App\SiteDownloader.App.csproj" />
   </ItemGroup>
 
   <ItemGroup>
