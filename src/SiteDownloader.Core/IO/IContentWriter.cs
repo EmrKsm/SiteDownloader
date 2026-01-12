@@ -1,4 +1,4 @@
-namespace SiteDownloader;
+namespace SiteDownloader.IO;
 
 public interface IContentWriter
 {

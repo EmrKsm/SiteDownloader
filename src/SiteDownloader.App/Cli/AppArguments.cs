@@ -1,4 +1,4 @@
-namespace SiteDownloader;
+namespace SiteDownloader.App.Cli;
 
 public enum LogFormat
 {

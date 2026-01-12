@@ -1,4 +1,6 @@
 using System.Net;
+using SiteDownloader.Downloading;
+using SiteDownloader.IO;
 
 namespace SiteDownloader.IntegrationTests;
 
@@ -16,16 +18,16 @@ public sealed class DownloadOrchestratorIntegrationTests
         var builder = Host.CreateApplicationBuilder();
         builder.Services.AddLogging();
 
-        builder.Services.AddSingleton<SiteDownloader.IContentWriter, SiteDownloader.FileSystemContentWriter>();
-        builder.Services.AddHttpClient<SiteDownloader.IPageDownloader, SiteDownloader.HttpPageDownloader>()
+        builder.Services.AddSingleton<IContentWriter, FileSystemContentWriter>();
+        builder.Services.AddHttpClient<IPageDownloader, HttpPageDownloader>()
             .ConfigureHttpClient(c => c.Timeout = Timeout.InfiniteTimeSpan);
 
-        builder.Services.AddSingleton<SiteDownloader.DownloadOrchestrator>();
+        builder.Services.AddSingleton<DownloadOrchestrator>();
 
         using var host = builder.Build();
-        var orchestrator = host.Services.GetRequiredService<SiteDownloader.DownloadOrchestrator>();
+        var orchestrator = host.Services.GetRequiredService<DownloadOrchestrator>();
 
-        var options = new SiteDownloader.DownloadRunOptions(
+        var options = new DownloadRunOptions(
             OutputRoot: temp,
             MaxConcurrency: 2,
             RequestTimeout: TimeSpan.FromSeconds(10));

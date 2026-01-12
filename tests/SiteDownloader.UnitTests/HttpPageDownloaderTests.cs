@@ -1,4 +1,5 @@
 using System.Net;
+using SiteDownloader.Downloading;
 
 namespace SiteDownloader.UnitTests;
 
@@ -13,7 +14,7 @@ public sealed class HttpPageDownloaderTests
         });
 
         using var client = new HttpClient(handler);
-        var downloader = new SiteDownloader.HttpPageDownloader(client);
+        var downloader = new HttpPageDownloader(client);
 
         using var response = await downloader.DownloadAsync(new Uri("https://example.com/"), CancellationToken.None);
 

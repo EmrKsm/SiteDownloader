@@ -1,7 +1,8 @@
 using System.Threading.Channels;
 using Microsoft.Extensions.Logging;
+using SiteDownloader.IO;
 
-namespace SiteDownloader;
+namespace SiteDownloader.Downloading;
 
 public sealed class DownloadOrchestrator(
     IPageDownloader downloader,

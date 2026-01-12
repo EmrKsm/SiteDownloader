@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace SiteDownloader;
+namespace SiteDownloader.Pathing;
 
 public static class UrlOutputPath
 {

@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace SiteDownloader;
+namespace SiteDownloader.Downloading;
 
 public sealed record DownloadResult(
     Uri Url,

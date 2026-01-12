@@ -1,4 +1,6 @@
-namespace SiteDownloader;
+using SiteDownloader.Pathing;
+
+namespace SiteDownloader.IO;
 
 public sealed class FileSystemContentWriter : IContentWriter
 {

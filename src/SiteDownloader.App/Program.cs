@@ -6,8 +6,11 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
+using SiteDownloader.App.Cli;
+using SiteDownloader.Downloading;
+using SiteDownloader.IO;
 
-namespace SiteDownloader;
+namespace SiteDownloader.App;
 
 public static class Program
 {

@@ -1,4 +1,4 @@
-namespace SiteDownloader;
+namespace SiteDownloader.Downloading;
 
 public sealed record DownloadRunOptions(
     string OutputRoot,

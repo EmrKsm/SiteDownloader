@@ -1,4 +1,4 @@
-namespace SiteDownloader;
+namespace SiteDownloader.Downloading;
 
 public interface IPageDownloader
 {
