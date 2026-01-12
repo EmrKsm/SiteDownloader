@@ -13,8 +13,6 @@ public sealed record AppArguments(
     int TimeoutSeconds,
     string OutputRoot,
     LogFormat LogFormat,
-    bool DownloadAssets,
-    bool IncludeThirdPartyAssets,
     bool ShowHelp
 )
 {
@@ -24,9 +22,7 @@ public sealed record AppArguments(
         MaxConcurrency: 8,
         TimeoutSeconds: 30,
         OutputRoot: "downloads",
-        LogFormat: LogFormat.Json,
-        DownloadAssets: false,
-        IncludeThirdPartyAssets: false,
+        LogFormat: LogFormat.Text,
         ShowHelp: false);
 
     public static bool TryParse(string[] args, out AppArguments parsed, out string? error)
@@ -40,8 +36,6 @@ public sealed record AppArguments(
         var timeoutSeconds = parsed.TimeoutSeconds;
         var outputRoot = parsed.OutputRoot;
         var logFormat = parsed.LogFormat;
-        var downloadAssets = parsed.DownloadAssets;
-        var includeThirdPartyAssets = parsed.IncludeThirdPartyAssets;
         var showHelp = false;
 
         for (var i = 0; i < args.Length; i++)
@@ -123,23 +117,11 @@ public sealed record AppArguments(
                 continue;
             }
 
-            if (a is "--download-assets")
-            {
-                downloadAssets = true;
-                continue;
-            }
-
-            if (a is "--include-third-party-assets")
-            {
-                includeThirdPartyAssets = true;
-                continue;
-            }
-
             error = $"Unknown argument: {a}";
             return false;
         }
 
-        parsed = new AppArguments(urls, file, maxConcurrency, timeoutSeconds, outputRoot, logFormat, downloadAssets, includeThirdPartyAssets, showHelp);
+        parsed = new AppArguments(urls, file, maxConcurrency, timeoutSeconds, outputRoot, logFormat, showHelp);
         return true;
     }
 
@@ -169,8 +151,6 @@ public sealed record AppArguments(
         "  --max-concurrency <N>     Default: 8\n" +
         "  --timeout-seconds <N>     Default: 30\n" +
         "  --output <path>           Default: ./downloads\n" +
-        "  --log-format json|text    Default: json\n" +
-        "  --download-assets         Also download referenced assets (CSS/JS/img) and rewrite HTML for offline viewing\n" +
-        "  --include-third-party-assets  Allow assets from other domains (default: same-origin only)\n" +
+        "  --log-format json|text    Default: text (console only; file logs are always text)\n" +
         "  -h|--help                 Show help\n";
 }

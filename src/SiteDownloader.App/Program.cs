@@ -51,20 +51,13 @@ public static class Program
         var options = new DownloadRunOptions(
             OutputRoot: Path.GetFullPath(parsed.OutputRoot),
             MaxConcurrency: parsed.MaxConcurrency,
-            RequestTimeout: TimeSpan.FromSeconds(parsed.TimeoutSeconds),
-            DownloadAssets: parsed.DownloadAssets,
-            IncludeThirdPartyAssets: parsed.IncludeThirdPartyAssets);
+            RequestTimeout: TimeSpan.FromSeconds(parsed.TimeoutSeconds));
 
         logger.LogInformation("Starting download: {Count} urls, maxConcurrency={MaxConcurrency}, timeout={TimeoutSeconds}s, output={Output}",
             urls.Count,
             options.MaxConcurrency,
             options.RequestTimeout.TotalSeconds,
             options.OutputRoot);
-
-        if (options.DownloadAssets)
-        {
-            logger.LogInformation("Asset mirroring enabled (thirdPartyAssets={IncludeThirdParty})", options.IncludeThirdPartyAssets);
-        }
 
         IReadOnlyList<DownloadResult> results;
         try
@@ -104,7 +97,7 @@ public static class Program
         var logDir = Path.GetFullPath("logs");
         Directory.CreateDirectory(logDir);
 
-        var filePath = Path.Combine(logDir, "log-.ndjson");
+        var filePath = Path.Combine(logDir, "log-.log");
 
         var loggerConfiguration = new LoggerConfiguration()
             .MinimumLevel.Information()
@@ -112,19 +105,19 @@ public static class Program
             .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
             .MinimumLevel.Override("System.Net.Http.HttpClient", LogEventLevel.Information)
             .Enrich.FromLogContext()
-            // Always write structured logs to file (newline-delimited JSON), one file per day.
+            // Always write structured logs to file (human-readable text), one file per day.
             .WriteTo.File(
-                new CompactJsonFormatter(),
                 filePath,
                 rollingInterval: RollingInterval.Day,
                 retainedFileCountLimit: 14,
-                shared: true);
+                shared: true,
+                outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj} {Properties}{NewLine}{Exception}");
 
         // Console output format is selectable.
         if (parsed.LogFormat == LogFormat.Text)
         {
             loggerConfiguration = loggerConfiguration.WriteTo.Console(
-                outputTemplate: "{Timestamp:HH:mm:ss} [{Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}");
+                outputTemplate: "{Timestamp:HH:mm:ss} [{Level:u3}] {Message:lj} {Properties}{NewLine}{Exception}");
         }
         else
         {
@@ -137,8 +130,6 @@ public static class Program
         builder.Logging.AddSerilog(Log.Logger, dispose: true);
 
         builder.Services.AddSingleton<IContentWriter, FileSystemContentWriter>();
-
-        builder.Services.AddSingleton<SiteDownloader.Mirroring.IPageMirror, SiteDownloader.Mirroring.PageMirror>();
 
         // Typed client: created by IHttpClientFactory; no incorrect multiple HttpClient instances.
         builder.Services.AddHttpClient<IPageDownloader, HttpPageDownloader>(client =>

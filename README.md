@@ -38,14 +38,8 @@ From the repo root:
 	 --max-concurrency 10 `
 	 --timeout-seconds 30 `
 	 --output .\downloads `
-	 --log-format json `
+	 --log-format text `
 	 --urls "https://www.microsoft.com,https://learn.microsoft.com,https://github.com,https://www.nuget.org,https://dotnet.microsoft.com,https://stackoverflow.com,https://www.wikipedia.org,https://www.bbc.com,https://www.nytimes.com,https://www.reuters.com,https://www.theguardian.com,https://www.mozilla.org,https://www.python.org,https://nodejs.org,https://www.oracle.com,https://kubernetes.io,https://www.docker.com,https://www.cloudflare.com,https://www.reddit.com,https://news.ycombinator.com"
-
-# Same, but also download same-origin assets (CSS/JS/images) and rewrite HTML for offline viewing
- dotnet run --project .\src\SiteDownloader.App -- `
-	 --download-assets `
-	 --max-concurrency 10 `
-	 --urls "https://example.com"
 ```
 
 ### 2) Provide URLs from a file
@@ -86,20 +80,18 @@ Examples:
 Logs are written in two places:
 
 - Console: text or structured JSON (see `--log-format`)
-- Files: daily rolling structured logs in `./logs/` as newline-delimited JSON
+- Files: daily rolling structured logs in `./logs/` as human-readable text
 
 Example file name:
 
-- `logs/log-20260112.ndjson`
+- `logs/log-20260112.log`
 
 ## Options
 
 - `--max-concurrency <N>` (default: 8)
 - `--timeout-seconds <N>` (default: 30)
 - `--output <path>` (default: `./downloads`)
-- `--log-format text|json` (default: json)
-- `--download-assets` (default: off; downloads same-origin assets and rewrites HTML)
-- `--include-third-party-assets` (default: off; enables CDN/3rd-party assets)
+- `--log-format text|json` (default: text)
 
 ## Tests
 
@@ -123,5 +115,5 @@ Run:
 
 ## Notes
 
-- This repository includes `downloads/` as a folder; typically you would add it to `.gitignore`.
+- `downloads/` and `logs/` are runtime output folders; typically you add them to `.gitignore`.
 - Integration tests start a local HTTP server on a dynamic port.

@@ -28,9 +28,7 @@ public sealed class DownloadOrchestratorIntegrationTests
         var options = new SiteDownloader.DownloadRunOptions(
             OutputRoot: temp,
             MaxConcurrency: 2,
-            RequestTimeout: TimeSpan.FromSeconds(10),
-            DownloadAssets: false,
-            IncludeThirdPartyAssets: false);
+            RequestTimeout: TimeSpan.FromSeconds(10));
 
         var results = await orchestrator.RunAsync(new[] { url }, options, CancellationToken.None);
 

@@ -1,14 +1,12 @@
 using System.Threading.Channels;
 using Microsoft.Extensions.Logging;
-using SiteDownloader.Mirroring;
 
 namespace SiteDownloader;
 
 public sealed class DownloadOrchestrator(
     IPageDownloader downloader,
     IContentWriter writer,
-    ILogger<DownloadOrchestrator> logger,
-    IPageMirror? pageMirror = null)
+    ILogger<DownloadOrchestrator> logger)
 {
     public async Task<IReadOnlyList<DownloadResult>> RunAsync(
         IEnumerable<Uri> urls,
@@ -32,8 +30,6 @@ public sealed class DownloadOrchestrator(
         var results = new List<DownloadResult>();
         var resultsLock = new object();
 
-        var mirrorContext = options.DownloadAssets ? new MirrorRunContext() : null;
-
         var workers = Enumerable.Range(0, options.MaxConcurrency)
             .Select(_ => Task.Run(async () =>
             {
@@ -41,7 +37,7 @@ public sealed class DownloadOrchestrator(
                 {
                     while (channel.Reader.TryRead(out var url))
                     {
-                        var result = await ProcessOneAsync(url, options, mirrorContext, cancellationToken).ConfigureAwait(false);
+                        var result = await ProcessOneAsync(url, options, cancellationToken).ConfigureAwait(false);
                         lock (resultsLock)
                         {
                             results.Add(result);
@@ -67,7 +63,7 @@ public sealed class DownloadOrchestrator(
         return results;
     }
 
-    private async Task<DownloadResult> ProcessOneAsync(Uri url, DownloadRunOptions options, MirrorRunContext? mirrorContext, CancellationToken cancellationToken)
+    private async Task<DownloadResult> ProcessOneAsync(Uri url, DownloadRunOptions options, CancellationToken cancellationToken)
     {
         using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         timeoutCts.CancelAfter(options.RequestTimeout);
@@ -87,21 +83,7 @@ public sealed class DownloadOrchestrator(
                 return new DownloadResult(url, Success: false, StatusCode: code, OutputPath: null, Error: $"HTTP {(int)code} {code}");
             }
 
-            string outputPath;
-            if (options.DownloadAssets && mirrorContext is not null && IsHtml(response))
-            {
-                if (pageMirror is null)
-                {
-                    throw new InvalidOperationException("Asset mirroring is enabled, but no IPageMirror is configured.");
-                }
-
-                outputPath = await pageMirror.SaveHtmlWithAssetsAsync(url, response, options, mirrorContext, timeoutCts.Token)
-                    .ConfigureAwait(false);
-            }
-            else
-            {
-                outputPath = await writer.SaveAsync(url, response, options.OutputRoot, timeoutCts.Token).ConfigureAwait(false);
-            }
+            var outputPath = await writer.SaveAsync(url, response, options.OutputRoot, timeoutCts.Token).ConfigureAwait(false);
             logger.LogInformation("Saved {Url} to {OutputPath}", url, outputPath);
 
             return new DownloadResult(url, Success: true, StatusCode: response.StatusCode, OutputPath: outputPath, Error: null);
@@ -126,11 +108,5 @@ public sealed class DownloadOrchestrator(
             logger.LogError(ex, "Unexpected error for {Url}", url);
             return new DownloadResult(url, Success: false, StatusCode: null, OutputPath: null, Error: ex.Message);
         }
-    }
-
-    private static bool IsHtml(HttpResponseMessage response)
-    {
-        var mediaType = response.Content.Headers.ContentType?.MediaType;
-        return string.Equals(mediaType, "text/html", StringComparison.OrdinalIgnoreCase);
     }
 }
