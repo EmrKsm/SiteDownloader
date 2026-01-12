@@ -39,7 +39,7 @@ public static class Program
             cts.Cancel();
         };
 
-        var urls = await UrlInputs.GetUrlsAsync(parsed, cts.Token).ConfigureAwait(false);
+        var urls = await UrlInputs.GetUrlsAsync(parsed, cts.Token);
         if (urls.Count == 0)
         {
             Console.Error.WriteLine("No valid URLs provided.");
@@ -65,7 +65,7 @@ public static class Program
         IReadOnlyList<DownloadResult> results;
         try
         {
-            results = await orchestrator.RunAsync(urls, options, cts.Token).ConfigureAwait(false);
+            results = await orchestrator.RunAsync(urls, options, cts.Token);
         }
         catch (OperationCanceledException)
         {

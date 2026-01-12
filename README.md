@@ -35,11 +35,11 @@ From the repo root:
 
 # 20 URLs with concurrency 10 (copy/paste)
  dotnet run --project .\src\SiteDownloader.App -- `
-	 --max-concurrency 10 `
-	 --timeout-seconds 30 `
-	 --output .\downloads `
-	 --log-format text `
-	 --urls "https://www.microsoft.com,https://learn.microsoft.com,https://github.com,https://www.nuget.org,https://dotnet.microsoft.com,https://stackoverflow.com,https://www.wikipedia.org,https://www.bbc.com,https://www.nytimes.com,https://www.reuters.com,https://www.theguardian.com,https://www.mozilla.org,https://www.python.org,https://nodejs.org,https://www.oracle.com,https://kubernetes.io,https://www.docker.com,https://www.cloudflare.com,https://www.reddit.com,https://news.ycombinator.com"
+     --max-concurrency 10 `
+     --timeout-seconds 30 `
+     --output .\downloads `
+     --log-format text `
+     --urls "https://www.microsoft.com,https://learn.microsoft.com,https://github.com,https://www.nuget.org,https://dotnet.microsoft.com,https://stackoverflow.com,https://www.wikipedia.org,https://www.bbc.com,https://www.nytimes.com,https://www.reuters.com,https://www.theguardian.com,https://www.mozilla.org,https://www.python.org,https://nodejs.org,https://www.oracle.com,https://kubernetes.io,https://www.docker.com,https://www.cloudflare.com,https://www.reddit.com,https://news.ycombinator.com"
 ```
 
 ### 2) Provide URLs from a file

@@ -13,13 +13,13 @@ public static class UrlInputs
 
         if (!string.IsNullOrWhiteSpace(args.FilePath))
         {
-            var fromFile = await ReadUrlsFromFileAsync(args.FilePath!, cancellationToken).ConfigureAwait(false);
+            var fromFile = await ReadUrlsFromFileAsync(args.FilePath!, cancellationToken);
             urls.AddRange(fromFile);
         }
 
         if (urls.Count == 0)
         {
-            urls.AddRange(await ReadUrlsInteractivelyAsync(cancellationToken).ConfigureAwait(false));
+            urls.AddRange(await ReadUrlsInteractivelyAsync(cancellationToken));
         }
 
         return urls
@@ -52,7 +52,7 @@ public static class UrlInputs
             throw new FileNotFoundException("URL list file not found.", filePath);
         }
 
-        var lines = await File.ReadAllLinesAsync(filePath, cancellationToken).ConfigureAwait(false);
+        var lines = await File.ReadAllLinesAsync(filePath, cancellationToken);
         return lines
             .Select(l => l.Trim())
             .Where(l => l.Length > 0 && !l.StartsWith('#'))

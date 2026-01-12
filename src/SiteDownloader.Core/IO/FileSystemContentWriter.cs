@@ -10,7 +10,7 @@ public sealed class FileSystemContentWriter : IContentWriter
         var outputFile = UrlOutputPath.GetOutputFilePath(outputRoot, url, contentType);
         Directory.CreateDirectory(Path.GetDirectoryName(outputFile)!);
 
-        await using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+        await using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken);
         await using var fileStream = new FileStream(
             outputFile,
             FileMode.Create,
@@ -19,8 +19,8 @@ public sealed class FileSystemContentWriter : IContentWriter
             bufferSize: 81920,
             options: FileOptions.Asynchronous | FileOptions.SequentialScan);
 
-        await responseStream.CopyToAsync(fileStream, cancellationToken).ConfigureAwait(false);
-        await fileStream.FlushAsync(cancellationToken).ConfigureAwait(false);
+        await responseStream.CopyToAsync(fileStream, cancellationToken);
+        await fileStream.FlushAsync(cancellationToken);
 
         return outputFile;
     }

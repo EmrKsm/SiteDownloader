@@ -8,7 +8,6 @@ public sealed class HttpPageDownloader(HttpClient httpClient) : IPageDownloader
         request.Headers.TryAddWithoutValidation("User-Agent", "SiteDownloader/1.0 (+https://example.invalid)");
 
         // ResponseHeadersRead ensures we don't buffer the whole body in memory.
-        return await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
-            .ConfigureAwait(false);
+        return await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
     }
 }

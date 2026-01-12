@@ -32,35 +32,39 @@ public sealed class DownloadOrchestrator(
         var resultsLock = new object();
 
         var workers = Enumerable.Range(0, options.MaxConcurrency)
-            .Select(_ => Task.Run(async () =>
-            {
-                while (await channel.Reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
-                {
-                    while (channel.Reader.TryRead(out var url))
-                    {
-                        var result = await ProcessOneAsync(url, options, cancellationToken).ConfigureAwait(false);
-                        lock (resultsLock)
-                        {
-                            results.Add(result);
-                        }
-                    }
-                }
-            }, cancellationToken))
+            .Select(_ => ProcessChannelAsync(channel.Reader, options, cancellationToken, results, resultsLock))
             .ToArray();
+
+        async Task ProcessChannelAsync(
+            ChannelReader<Uri> reader,
+            DownloadRunOptions opts,
+            CancellationToken ct,
+            List<DownloadResult> resultsList,
+            object lockObj)
+        {
+            await foreach (var url in reader.ReadAllAsync(ct))
+            {
+                var result = await ProcessOneAsync(url, opts, ct);
+                lock (lockObj)
+                {
+                    resultsList.Add(result);
+                }
+            }
+        }
 
         try
         {
             foreach (var url in urls)
             {
-                await channel.Writer.WriteAsync(url, cancellationToken).ConfigureAwait(false);
+                await channel.Writer.WriteAsync(url, cancellationToken);
             }
         }
         finally
         {
-            channel.Writer.TryComplete();
+            channel.Writer.Complete();
         }
 
-        await Task.WhenAll(workers).ConfigureAwait(false);
+        await Task.WhenAll(workers);
         return results;
     }
 
@@ -73,7 +77,7 @@ public sealed class DownloadOrchestrator(
         {
             logger.LogInformation("Downloading {Url}", url);
 
-            using var response = await downloader.DownloadAsync(url, timeoutCts.Token).ConfigureAwait(false);
+            using var response = await downloader.DownloadAsync(url, timeoutCts.Token);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -84,7 +88,7 @@ public sealed class DownloadOrchestrator(
                 return new DownloadResult(url, Success: false, StatusCode: code, OutputPath: null, Error: $"HTTP {(int)code} {code}");
             }
 
-            var outputPath = await writer.SaveAsync(url, response, options.OutputRoot, timeoutCts.Token).ConfigureAwait(false);
+            var outputPath = await writer.SaveAsync(url, response, options.OutputRoot, timeoutCts.Token);
             logger.LogInformation("Saved {Url} to {OutputPath}", url, outputPath);
 
             return new DownloadResult(url, Success: true, StatusCode: response.StatusCode, OutputPath: outputPath, Error: null);
