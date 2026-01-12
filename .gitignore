@@ -1,0 +1,21 @@
+# Build outputs
+**/bin/
+**/obj/
+
+# IDE
+.vs/
+.vscode/
+
+# User/environment
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Logs
+logs/
+**/logs/
+
+# Download output folder
+downloads/
+**/downloads/
