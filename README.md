@@ -136,11 +136,8 @@ https://example.com
 
 Run:
 
-```powershell
-dotnet run --project .\src\SiteDownloader.App -- --file .\urls.txt
-
 # File input with custom settings
-dotnet run --project .\src\SiteDownloader.App -- --file .\urls.txt --max-concurrency 10 --log-format json
+dotnet run --project .\src\SiteDownloader.App -- --output .\downloads --log-format text --file .\data\urls.txt --max-concurrency 10
 ```
 
 ### 3) Interactive input (if no args)
